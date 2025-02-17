@@ -6,17 +6,17 @@
 LiquidCrystal_I2C lcd(0x27, 20, 4);// an lcd displayer object 
 
 
-int leds[4]={2,3,4,5};
-int buttuns[4]={7,6,8,9};
+int leds[4]={2,3,4,5};// defining an array to store pins of the leds 
+int buttuns[4]={7,6,8,9};// defining an array to store pins of the buttons
 
 
-int patern[10]={0,0,0, 0,0,0, 0,0,0,0};
-int score=2;
-int typing=0;
+int patern[10]={0,0,0, 0,0,0, 0,0,0,0}; // array to store the patern where the values will be the index of the led to turn on in the array leds
+int score=2; // starting at 2 so that the patern shown has 3 leds at least but we will substract the 2 to show the real score 
+int typing=0;// 0 to show the patern then switched to 1 to avoid showing it again and give the user the chance to type his answer
 
-int step=0;
+int step=0;// how many right clicks the user does 
 
-int level=1;
+int level=1; // used to change the speed of the game 
 
 
 int button1_state=HIGH; // variable for the state of each speed button
@@ -30,7 +30,7 @@ void setup() {
 
   lcd.init(); // initialisation of the displayer
   lcd.clear();
-  lcd.backlight(); // active le rétro-éclairage
+  lcd.backlight(); 
 
   pinMode(BUZZER_PIN, OUTPUT);
 
@@ -44,8 +44,8 @@ void setup() {
   pinMode(8, INPUT_PULLUP);
   pinMode(9, INPUT_PULLUP);
 
-  randomSeed(analogRead(A0)); // Initialisation de la graine aléatoire
-  patern[0] = random(4);
+  randomSeed(analogRead(A0)); // to initialise the random function to generate diffrent number each time 
+  patern[0] = random(4); /// the first two steps are random and by defaut shown 
   patern[1] = random(4);
   lcd.print("   WELCOME !!   ");
   delay(1500);
@@ -65,14 +65,14 @@ void loop() {
     button4_state=digitalRead(9);
 
      
-        if (button1_state==LOW) 
+        if (button1_state==LOW) // if the buttun number one is pressed 
         {
-              if(patern[step]==0)
+              if(patern[step]==0) // if the number in the patern array for the cuurent step is equal to the index of the pressed button 
               {
-                correct();
+                correct(); // the answer is correct 
               }
               else {
-                wrong();
+                wrong();// the answer is wrong 
               }
 
         }
@@ -108,27 +108,27 @@ void loop() {
         }
 
     
-    if (step==(score+1))
+    if (step==(score+1)) // if the number of steps achieved become equal to the current score +1 means that the patern shown and typed match
     {
-      if (score<9)
+      if (score<9) // if the score is less than 9 means that we will add another led an stay in the current level 
       {
-        congrates();
+        congrates();// and show a congratulations message 
       }
       
-      typing=0;
-      step=0;
-      score++;
-      if (score ==10)
+      typing=0; // now we stop typing we show the the patern with the extra led added to it (if we still i the same level of course )
+      step=0; // reset the step number
+      score++; // increase the score 
+      if (score ==10) // if the score is 10 then the level has ended 
       {
         
-        if (score!=3)
+        if (level!=3) // if level  is not 3 we pass to the next level
         {
-          nailed_it();
+          nailed_it(); // show a nailed it message 
         }
-        if (level==3)
+        if (level==3) // if the level is 3 the game ends 
         {
-          
-          end();
+           
+          end();// show the end message 
         }
 
         level++;
@@ -146,9 +146,9 @@ void loop() {
 }
 
 
-void show_patern(int score)
+void show_patern(int score) // a function to show the petern 
 {
-    patern[score]=random(4);
+    patern[score]=random(4); // add a led to the patern 
     lcd.clear();
     lcd.print("get ready...");
     delay(1500);
@@ -156,14 +156,16 @@ void show_patern(int score)
     lcd.clear();
     lcd.print("patern ...  ");
 
-    for (int i=0;i<(score+1);i++)
+    for (int i=0;i<(score+1);i++) // showing the patern by iterating through the patern array 
     {
-      int speed=1000-level*250;
-      digitalWrite(leds[patern[i]], HIGH);
+      int speed=1000-level*250; // defining the speed the game 
+      digitalWrite(leds[patern[i]], HIGH); // light up the led that is index in the leds table is: the number that its index is i 
       delay(speed);
       digitalWrite(leds[patern[i]], LOW);
       delay(speed);
     }
+
+    // the end of the patern showing now the user should go ahead and type his answer 
     lcd.clear();
     lcd.print("go ahead !");
     lcd.setCursor(0,1);
@@ -178,13 +180,13 @@ void show_patern(int score)
 
 
 
-void correct()
+void correct() // a function to show a message saying correct and the preogress of the typing and in the level 
 {
   lcd.clear();
   lcd.print("correct !");
   lcd.setCursor(0,1);
   lcd.print("  [");
-  for (int i=0;i<step+1;i++)
+  for (int i=0;i<step+1;i++) // show as much "|" as the steps achieved 
   {
     lcd.print("|");
   }
@@ -198,8 +200,8 @@ void correct()
 
   correct_buzz();
 }
-void wrong()
-{
+void wrong() // a function to show a message saying wrong , you lost and the score and the level then restarting the game 
+{ 
   lcd.clear();
   lcd.print("wrong !!");
 
@@ -214,6 +216,7 @@ void wrong()
   lcd.print("   lvl:");
   lcd.print(level);
   delay(3000);
+  // reseting the game parametres 
   typing=0;
   score=2;
   level=1;
@@ -226,10 +229,10 @@ void wrong()
 
 }
 
-void congrates()
+void congrates() // a function to show a massage saying congrates and continuing 
 {
   lcd.clear();
-  lcd.print("congradulation!");
+  lcd.print("congradulations!");
   congrates_buzz();
   delay(1000);
   lcd.clear();
@@ -238,7 +241,7 @@ void congrates()
 }
 
 
-void nailed_it()
+void nailed_it() // A function that displays a message saying "You nailed it!" and announces the next level. 
 {
   lcd.clear();
   lcd.print("you nailed it!");
@@ -259,7 +262,7 @@ void nailed_it()
 
 
 
-void end()
+void end() // a function to announce the end of the game and starting a new game 
 {
   lcd.clear();
   lcd.print("wow !!");
@@ -277,11 +280,11 @@ void end()
   lcd.print("   lvl:");
   lcd.print(level);
   delay(2500);
-
+  // starting a new game 
   lcd.clear();
   lcd.print("    New Game    ");
   delay(1000);
-
+// resetting the game parametres 
   typing=0;
   level=1;
   score=2;
@@ -295,75 +298,85 @@ void end()
 
 
 
-
-
+// functions for the diffirent type of buzzes 
 void correct_buzz() {
+  // Gradually increasing frequency to indicate a correct answer
   for (int f = 800; f <= 1000; f += 20) {
     tone(BUZZER_PIN, f);
     delay(10);
   }
   delay(100);
+  
+  // Second frequency rise for confirmation
   for (int f = 1000; f <= 1500; f += 25) {
     tone(BUZZER_PIN, f);
     delay(10);
   }
   delay(100);
+  
   noTone(BUZZER_PIN);
 }
 
 void wrong_buzz() {
+  // Decreasing frequency to indicate a wrong answer
   for (int f = 600; f >= 400; f -= 20) {
     tone(BUZZER_PIN, f);
     delay(10);
   }
   delay(400);
+  
   noTone(BUZZER_PIN);
 }
 
 void start_buzz() {
+  // Rising frequency to indicate the start of the game
   for (int f = 1800; f <= 2100; f += 30) {
     tone(BUZZER_PIN, f);
     delay(10);
   }
   delay(150);
+  
   noTone(BUZZER_PIN);
 }
 
 void go_ahead_buzz() {
+  // High-pitched ascending tone to indicate progress
   for (int f = 2500; f <= 2800; f += 30) {
     tone(BUZZER_PIN, f);
     delay(10);
   }
   delay(150);
+  
   noTone(BUZZER_PIN);
 }
 
 void congrates_buzz() {
+  // First rising tone to initiate the congratulation sound
   for (int f = 400; f <= 500; f += 10) {
     tone(BUZZER_PIN, f);
     delay(10);
   }
   delay(100);
+  
+  // Second rising tone for an uplifting effect
   for (int f = 800; f <= 1200; f += 20) {
     tone(BUZZER_PIN, f);
     delay(10);
   }
   delay(100);
+  
   noTone(BUZZER_PIN);
 }
 
-
-
-
 void nailed_it_buzz() {
-  // Montée rapide en fréquence pour un effet de succès
+  // Fast frequency rise for a success effect
   for (int f = 700; f <= 1500; f += 50) {
     tone(BUZZER_PIN, f);
     delay(10);
   }
   delay(100);
   
-  // Petite confirmation avec une note plus aiguë
+  // Small confirmation with a higher note
   tone(BUZZER_PIN, 1800, 200);
   delay(250);
   
@@ -371,17 +384,16 @@ void nailed_it_buzz() {
 }
 
 void end_buzz() {
-  // Son grave descendant pour marquer la fin du jeu
+  // Low descending tone to mark the end of the game
   for (int f = 1000; f >= 400; f -= 40) {
     tone(BUZZER_PIN, f);
     delay(15);
   }
   delay(200);
   
-  // Un petit écho final
+  // A final echo effect
   tone(BUZZER_PIN, 500, 300);
   delay(350);
   
   noTone(BUZZER_PIN);
 }
-
